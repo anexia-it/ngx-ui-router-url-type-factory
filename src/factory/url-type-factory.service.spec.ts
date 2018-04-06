@@ -50,6 +50,13 @@ export class MatchTestComponent {
 }
 
 
+@Component({
+    template: `ResolveTestComponent`
+})
+export class ResolveTestComponent {
+}
+
+
 export class SyncTestType implements UrlType<any> {
     name = 'SyncTest';
     match = /\d+/;
@@ -114,6 +121,28 @@ export class MatchTestType implements UrlType<any> {
 }
 
 
+export class ResolveTestType implements UrlType<any> {
+    name = 'ResolveTest';
+    match = /\d+/;
+    bindable = true;
+
+    represent(obj: any): string {
+        return String(obj.pk);
+    };
+
+    resolve(matched: string, injector: Injector) {
+        ResolveTestType['resolved'] = true;
+
+        return {
+            'pk': 1,
+            'attr1': 'match-value1',
+            'attr2': 'match-value2',
+        }
+    };
+
+}
+
+
 export const routingConfig = {
     states: [
         {
@@ -136,6 +165,11 @@ export const routingConfig = {
             url: '/match/{param1:MatchTest}',
             component: MatchTestComponent,
         },
+        {
+            name: 'resolve',
+            url: '/resolve/{param1:ResolveTest}',
+            component: ResolveTestComponent,
+        },
     ],
     useHash: true,
     config: configure,
@@ -157,6 +191,7 @@ describe('UrlTypeFactoryService', () => {
                     AsyncTestComponent,
                     SyncAsyncTestComponent,
                     MatchTestComponent,
+                    ResolveTestComponent,
                 ],
                 imports: [
                     UIRouterModule.forRoot(routingConfig),
@@ -165,6 +200,7 @@ describe('UrlTypeFactoryService', () => {
                             SyncTestType,
                             AsyncTestType,
                             MatchTestType,
+                            ResolveTestType,
                         ]
                     }),
                 ],
@@ -324,6 +360,58 @@ describe('UrlTypeFactoryService', () => {
                     url = router.stateService.href('match', {param1: 'b-1'});
 
                 expect(url).toBe(null);
+            })
+        )
+    );
+
+    it('Does not call resolve for creating the url from primitive',
+        async(
+            inject([], () => {
+                ResolveTestType['resolved'] = false;
+
+                router.stateService.href('resolve', {param1: 1});
+
+                expect(ResolveTestType['resolved']).toBe(false);
+            })
+        )
+    );
+
+    it('Does not call resolve for creating the url from object',
+        async(
+            inject([], () => {
+                ResolveTestType['resolved'] = false;
+
+                router.stateService.href('resolve', {param1: {
+                    pk: 1,
+                }});
+
+                expect(ResolveTestType['resolved']).toBe(false);
+            })
+        )
+    );
+
+    it('Does call resolve for changing state from primitive',
+        async(
+            inject([], () => {
+                ResolveTestType['resolved'] = false;
+
+                router.stateService.go('resolve', {param1: 1}).then(() => {
+                    expect(ResolveTestType['resolved']).toBe(true);
+                });
+            })
+        )
+    );
+
+    it('Does not call resolve for changing state from object',
+        async(
+            inject([], () => {
+                ResolveTestType['resolved'] = false;
+
+                router.stateService.go('resolve', {param1: {
+                    pk: 1,
+                }}).then(() => {
+                    expect(ResolveTestType['resolved']).toBe(false);
+                });
             })
         )
     );
