@@ -2,7 +2,7 @@ import { Component, Injector, Input, DebugElement } from "@angular/core";
 import { async, inject, TestBed, ComponentFixture } from "@angular/core/testing";
 import { By } from "@angular/platform-browser";
 
-import { UIRouter } from '@uirouter/core';
+import { UIRouter } from "@uirouter/core";
 import { UIRouterModule } from "@uirouter/angular";
 
 import { NgxUIRouterUrlTypeFactoryModule } from "../module";
@@ -39,6 +39,14 @@ export class AsyncTestComponent {
 export class SyncAsyncTestComponent {
     @Input() param1: any;
     @Input() param2: any;
+}
+
+
+@Component({
+    template: `MatchTestComponent`
+})
+export class MatchTestComponent {
+    @Input() param1: any;
 }
 
 
@@ -86,6 +94,26 @@ export class AsyncTestType implements UrlType<any> {
 }
 
 
+export class MatchTestType implements UrlType<any> {
+    name = 'MatchTest';
+    match = /a-\d+/;
+    bindable = true;
+
+    represent(obj: any): string {
+        return String(obj.pk);
+    };
+
+    resolve(matched: string, injector: Injector) {
+        return {
+            'pk': 1,
+            'attr1': 'match-value1',
+            'attr2': 'match-value2',
+        }
+    };
+
+}
+
+
 export const routingConfig = {
     states: [
         {
@@ -102,6 +130,11 @@ export const routingConfig = {
             name: 'sync-async',
             url: '/sync-async/{param1:SyncTest}/{param2:AsyncTest}',
             component: SyncAsyncTestComponent,
+        },
+        {
+            name: 'match',
+            url: '/match/{param1:MatchTest}',
+            component: MatchTestComponent,
         },
     ],
     useHash: true,
@@ -123,6 +156,7 @@ describe('UrlTypeFactoryService', () => {
                     SyncTestComponent,
                     AsyncTestComponent,
                     SyncAsyncTestComponent,
+                    MatchTestComponent,
                 ],
                 imports: [
                     UIRouterModule.forRoot(routingConfig),
@@ -130,6 +164,7 @@ describe('UrlTypeFactoryService', () => {
                         types: [
                             SyncTestType,
                             AsyncTestType,
+                            MatchTestType,
                         ]
                     }),
                 ],
@@ -267,6 +302,28 @@ describe('UrlTypeFactoryService', () => {
                     });
 
                 expect(url).toBe('#/sync-async/1/2');
+            })
+        )
+    );
+
+    it('Does get url if param matches the type pattern',
+        async(
+            inject([], () => {
+                let
+                    url = router.stateService.href('match', {param1: 'a-1'});
+
+                expect(url).toBe('#/match/a-1');
+            })
+        )
+    );
+
+    it('Does not get url if param does not match the type pattern',
+        async(
+            inject([], () => {
+                let
+                    url = router.stateService.href('match', {param1: 'b-1'});
+
+                expect(url).toBe(null);
             })
         )
     );
