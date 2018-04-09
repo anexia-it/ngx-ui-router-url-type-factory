@@ -1,5 +1,5 @@
 ngx-ui-router-url-type-factory
-Copyright 2018 Andreas Stocker <andreas@stocker.co.it>,
+Copyright 2018 Andreas Stocker <AStocker@anexia-it.com>,
 MIT License
 
 

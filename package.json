@@ -1,6 +1,6 @@
 {
   "name": "ngx-ui-router-url-type-factory",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "A factory used to build ui-router URL types that fetch data from RESTful APIs.",
   "main": "bundle/ngx-ui-router-url-type-factory.min.js",
   "module": "module.js",
@@ -25,7 +25,7 @@
     "type": "git",
     "url": "git@github.com:anx-astocker/ngx-ui-router-url-type-factory.git"
   },
-  "author": "Andreas Stocker <andreas@stocker.co.it>",
+  "author": "Andreas Stocker <AStocker@anexia-it.com>",
   "license": "MIT",
   "devDependencies": {
     "@angular/compiler": "^5.2.8",
