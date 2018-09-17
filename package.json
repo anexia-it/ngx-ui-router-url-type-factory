@@ -68,9 +68,7 @@
   "peerDependencies": {
     "@angular/core": "^5.0.0",
     "@angular/router": "^5.0.0",
-    "@angular/common": "^5.0.0"
-  },
-  "dependencies": {
-    "@uirouter/angular": "^1.0.1"
+    "@angular/common": "^5.0.0",
+    "@uirouter/angular": "^2.0.2"
   }
 }
