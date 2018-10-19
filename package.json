@@ -1,6 +1,6 @@
 {
   "name": "ngx-ui-router-url-type-factory",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "A factory used to build ui-router URL types that fetch data from RESTful APIs.",
   "main": "bundle/ngx-ui-router-url-type-factory.min.js",
   "module": "module.js",
