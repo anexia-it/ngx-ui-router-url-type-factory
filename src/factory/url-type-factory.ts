@@ -1,28 +1,25 @@
-import { Injector } from "@angular/core";
+import { Injector } from '@angular/core';
 
-import { Transition } from "@uirouter/angular";
-import { StatesModule } from "@uirouter/angular/lib/uiRouterNgModule";
-import { UIRouter } from "@uirouter/core/lib/router";
+import { Transition } from '@uirouter/angular';
+import { UIRouter } from '@uirouter/core/lib/router';
 
-import { UrlTypeFactoryService } from "./url-type-factory.service";
+import { UrlTypeFactoryService } from './url-type-factory.service';
 
 
 /**
  * Configures the ui-router module.
  * @param {UIRouter} router
  * @param {Injector} injector
- * @param {StatesModule} module
  */
-export function configure(router: UIRouter, injector: Injector, module: StatesModule) {
-    let
-        service = injector.get(UrlTypeFactoryService),
+export function configure(router: UIRouter, injector: Injector) {
+    const service = injector.get(UrlTypeFactoryService),
         configuration = service.configuration;
 
     /*
      * Register all types of the module configuration.
      */
-    for (let typeClass of configuration.types) {
-        service.registerType(new typeClass(), router, injector, module);
+    for (const typeClass of configuration.types) {
+        service.registerType(new typeClass(), router, injector);
     }
 
     /*
@@ -35,7 +32,7 @@ export function configure(router: UIRouter, injector: Injector, module: StatesMo
             }
         },
         (transition: Transition) => {
-            return service.doTransition(transition)
+            return service.doTransition(transition);
         }
-    )
+    );
 }
