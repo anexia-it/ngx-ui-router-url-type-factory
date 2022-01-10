@@ -15,7 +15,7 @@ import {
 })
 export class NgxUIRouterUrlTypeFactoryModule {
 
-    static forRoot(config: UrlTypeFactoryConfiguration): ModuleWithProviders {
+    static forRoot(config: UrlTypeFactoryConfiguration): ModuleWithProviders<any> {
         return {
             ngModule: NgxUIRouterUrlTypeFactoryModule,
             providers: [

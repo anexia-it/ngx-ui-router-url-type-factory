@@ -1,10 +1,10 @@
-import { InjectionToken, Type } from "@angular/core";
+import { InjectionToken, Type } from '@angular/core';
 
-import { UrlType } from "./url-type-factory.service";
+import { UrlType } from './url-type-factory.service';
 
 
 export interface UrlTypeFactoryConfiguration {
-    types: Type<UrlType<any>>[],
+    types: Type<UrlType<any>>[];
 }
 
 

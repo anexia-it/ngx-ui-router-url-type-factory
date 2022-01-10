@@ -1,19 +1,18 @@
-import { Inject, Injectable, Injector } from "@angular/core";
+import { Inject, Injectable, Injector } from '@angular/core';
 
-import { Transition } from "@uirouter/angular";
-import { StatesModule } from "@uirouter/angular/lib/uiRouterNgModule";
-import { UIRouter } from "@uirouter/core/lib/router";
-import { StateObject } from "@uirouter/core/lib/state";
-import { Param } from "@uirouter/core/lib/params";
+import { Transition } from '@uirouter/angular';
+import { UIRouter } from '@uirouter/core/lib/router';
+import { StateObject } from '@uirouter/core/lib/state';
+import { Param } from '@uirouter/core/lib/params';
 
 import {
     UrlTypeFactoryConfiguration,
     URL_TYPE_FACTORY_CONFIGURATION
-} from "./url-type-factory-configuration";
+} from './url-type-factory-configuration';
 import {
     UrlTypeFactoryRegistrationError,
     UrlTypeFactoryResolveError
-} from "./url-type-factory-error";
+} from './url-type-factory-error';
 
 
 const REPR_TOKEN = '__ngx_ui_router_url_type__repr';
@@ -55,7 +54,7 @@ export interface UrlType<T> {
      * Determines if the data of this type can be bound to an component by
      * the `@Input()` decorator.
      */
-    bindable?: boolean,
+    bindable?: boolean;
 
 }
 
@@ -80,17 +79,15 @@ export class UrlTypeFactoryService {
      * @returns {Promise<any[]>}
      */
     doTransition(transition: Transition) {
-        let
-            targetParams = transition.params('to'),
+         const targetParams = transition.params('to'),
             targetParamIds = this.getTypeIdsFromStateObject(transition.targetState().$state(), false),
             targetParamBindableIds = this.getTypeIdsFromStateObject(transition.targetState().$state(), true),
             targetPromises = [];
 
-        for (let targetParamId of targetParamIds) {
-            let
-                targetParamValue = targetParams[targetParamId],
-                targetParamResolved = targetParamValue[RSLV_TOKEN](),
-                targetParamPromise: Promise<any> = targetParamResolved && targetParamResolved['$promise'];
+        for (const targetParamId of targetParamIds) {
+            const targetParamValue = targetParams[targetParamId],
+                  targetParamResolved = targetParamValue[RSLV_TOKEN]();
+            let targetParamPromise: Promise<any> = targetParamResolved && targetParamResolved['$promise'];
 
             /*
              * If we do not work on a promise object, make a promise out of
@@ -112,12 +109,10 @@ export class UrlTypeFactoryService {
              */
             targetParamPromise = targetParamPromise
                 .then((resolved) => {
-                    let
-                        treeParams = transition.treeChanges()['to'];
+                    const treeParams = transition.treeChanges()['to'];
 
-                    for (let nodeParams of treeParams) {
-                        let
-                            nodeParamValues = nodeParams.paramValues || {};
+                    for (const nodeParams of treeParams) {
+                        const nodeParamValues = nodeParams.paramValues || {};
 
                         if (nodeParamValues.hasOwnProperty(targetParamId)) {
                             nodeParamValues[targetParamId] = resolved;
@@ -128,7 +123,7 @@ export class UrlTypeFactoryService {
                 })
                 .catch((error) => {
                     throw new UrlTypeFactoryResolveError(
-                        `The URL parameter '${targetParamId}' rejected. The error was: 
+                        `The URL parameter '${targetParamId}' rejected. The error was:
                         ${error}.`
                     );
                 });
@@ -161,10 +156,9 @@ export class UrlTypeFactoryService {
      * @returns {UrlType<any>}
      */
     getTypeByName(name: string, bindableOnly: boolean): UrlType<any> {
-        let
-            types = bindableOnly ? this._bindableTypes : this._registeredTypes;
+        const types = bindableOnly ? this._bindableTypes : this._registeredTypes;
 
-        for (let type of types) {
+        for (const type of types) {
             if (type.name === name) {
                 return type;
             }
@@ -179,16 +173,13 @@ export class UrlTypeFactoryService {
      * @returns {Param[]}
      */
     getTypeParamsFromStateObject(state: StateObject, bindableOnly: boolean): Param[] {
-        let
-            foundParams: Param[] = [];
+        const foundParams: Param[] = [];
 
-        for (let pathState of state.path) {
-            let
-                params = pathState.params || {};
+        for (const pathState of state.path) {
+            const params = pathState.params || {};
 
-            for (let paramName of Object.keys(params)) {
-                let
-                    param = params[paramName];
+            for (const paramName of Object.keys(params)) {
+                const param = params[paramName];
 
                 if (this.getTypeByName(param.type.name, bindableOnly)) {
                     foundParams.push(param);
@@ -216,16 +207,15 @@ export class UrlTypeFactoryService {
      * @param {UrlType<T>} type
      * @param {UIRouter} router
      * @param {Injector} injector
-     * @param {StatesModule} module
      */
-    registerType<T>(type: UrlType<T>, router: UIRouter, injector: Injector, module: StatesModule) {
+    registerType<T>(type: UrlType<T>, router: UIRouter, injector: Injector) {
         /*
          * Assert there is no type with the name of the given type registered.
          */
-        for (let registeredType of this._registeredTypes) {
+        for (const registeredType of this._registeredTypes) {
             if (type.name === registeredType.name) {
                 throw new UrlTypeFactoryRegistrationError(
-                    `There is already a type with the 
+                    `There is already a type with the
                     name '${registeredType.name}' registered.`
                 );
             }
@@ -249,20 +239,17 @@ export class UrlTypeFactoryService {
                 encode: (obj) => {
                     if (!!obj[REPR_TOKEN]) {
                         return obj[REPR_TOKEN];
-                    }
-                    else {
+                    } else {
                         return type.represent(obj);
                     }
                 },
                 decode: (repr) => {
-                    let
-                        obj = {};
+                    const obj = {};
 
                     if (repr && typeof repr === 'object') {
                         obj[REPR_TOKEN] = type.represent(repr);
                         obj[RSLV_TOKEN] = () => repr;
-                    }
-                    else {
+                    } else {
                         obj[REPR_TOKEN] = repr;
                         obj[RSLV_TOKEN] = () => type.resolve(repr, injector);
                     }
@@ -283,16 +270,13 @@ export class UrlTypeFactoryService {
                          * Compare objects by `REPR_TOKEN`, if available.
                          */
                         return a[REPR_TOKEN] === b[REPR_TOKEN];
-                    }
-
-                    else if (a && b &&
+                    } else if (a && b &&
                         typeof a === 'object' && typeof b === 'object') {
                         /*
                          * Compare objects by the `represent` result if `REPR_TOKEN` is not available.
                          */
                         return type.represent(a).toUpperCase() === type.represent(b).toUpperCase();
-                    }
-                    else {
+                    } else {
                         /*
                          * Compare directly if we are not working on objects.
                          */
@@ -301,7 +285,7 @@ export class UrlTypeFactoryService {
                 },
                 pattern: type.match,
             }
-        )
+        );
     }
 
 }

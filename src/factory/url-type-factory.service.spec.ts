@@ -1,13 +1,13 @@
-import { Component, Injector, Input, DebugElement } from "@angular/core";
-import { async, inject, TestBed, ComponentFixture } from "@angular/core/testing";
-import { By } from "@angular/platform-browser";
+import { Component, DebugElement, Injector, Input } from '@angular/core';
+import { ComponentFixture, inject, TestBed, waitForAsync } from '@angular/core/testing';
+import { By } from '@angular/platform-browser';
 
-import { UIRouter } from "@uirouter/core";
-import { UIRouterModule } from "@uirouter/angular";
+import { UIRouter } from '@uirouter/core';
+import { UIRouterModule } from '@uirouter/angular';
 
-import { NgxUIRouterUrlTypeFactoryModule } from "../module";
-import { UrlType } from "./url-type-factory.service";
-import { configure } from "./url-type-factory";
+import { NgxUIRouterUrlTypeFactoryModule } from '../module';
+import { UrlType } from './url-type-factory.service';
+import { configure } from './url-type-factory';
 
 
 @Component({
@@ -64,15 +64,15 @@ export class SyncTestType implements UrlType<any> {
 
     represent(obj: any): string {
         return String(obj.pk);
-    };
+    }
 
-    resolve(matched: string, injector: Injector) {
+    resolve(_matched: string, _injector: Injector) {
         return {
             'pk': 1,
             'attr1': 'sync-value1',
             'attr2': 'sync-value2',
-        }
-    };
+        };
+    }
 
 }
 
@@ -84,9 +84,9 @@ export class AsyncTestType implements UrlType<any> {
 
     represent(obj: any): string {
         return String(obj.pk);
-    };
+    }
 
-    resolve(matched: string, injector: Injector) {
+    resolve(_matched: string, _injector: Injector) {
         return new Promise(resolve => {
             setTimeout(() => {
                 resolve({
@@ -94,9 +94,9 @@ export class AsyncTestType implements UrlType<any> {
                     'attr1': 'async-value1',
                     'attr2': 'async-value2',
                 });
-            })
-        })
-    };
+            });
+        });
+    }
 
 }
 
@@ -108,15 +108,15 @@ export class MatchTestType implements UrlType<any> {
 
     represent(obj: any): string {
         return String(obj.pk);
-    };
+    }
 
-    resolve(matched: string, injector: Injector) {
+    resolve(_matched: string, _injector: Injector) {
         return {
             'pk': 1,
             'attr1': 'match-value1',
             'attr2': 'match-value2',
-        }
-    };
+        };
+    }
 
 }
 
@@ -128,17 +128,17 @@ export class ResolveTestType implements UrlType<any> {
 
     represent(obj: any): string {
         return String(obj.pk);
-    };
+    }
 
-    resolve(matched: string, injector: Injector) {
+    resolve(_matched: string, _injector: Injector) {
         ResolveTestType['resolved'] = true;
 
         return {
             'pk': 1,
             'attr1': 'match-value1',
             'attr2': 'match-value2',
-        }
-    };
+        };
+    }
 
 }
 
@@ -183,7 +183,7 @@ describe('UrlTypeFactoryService', () => {
         appComponent: DebugElement = null;
 
     beforeEach(
-        async(() => {
+        waitForAsync(() => {
             TestBed.configureTestingModule({
                 declarations: [
                     AppComponent,
@@ -216,10 +216,10 @@ describe('UrlTypeFactoryService', () => {
     );
 
     it('Does resolve synchronous url types',
-        async(
+        waitForAsync(
             inject([], () => {
                 router.stateService.go('sync', {param1: 1}).then(() => {
-                    let
+                    const
                         params = router.globals.params;
 
                     expect(params.param1.pk).toBe(1);
@@ -231,10 +231,10 @@ describe('UrlTypeFactoryService', () => {
     );
 
     it('Does resolve asynchronous url types',
-        async(
+        waitForAsync(
             inject([], () => {
                 router.stateService.go('async', {param1: 1}).then(() => {
-                    let
+                    const
                         params = router.globals.params;
 
                     expect(params.param1.pk).toBe(1);
@@ -246,10 +246,10 @@ describe('UrlTypeFactoryService', () => {
     );
 
     it('Does resolve synchronous and asynchronous url types',
-        async(
+        waitForAsync(
             inject([], () => {
                 router.stateService.go('sync-async', {param1: 1, param2: 1}).then(() => {
-                    let
+                    const
                         params = router.globals.params;
 
                     expect(params.param1.pk).toBe(1);
@@ -265,10 +265,10 @@ describe('UrlTypeFactoryService', () => {
     );
 
     it('Does bind synchronous url types',
-        async(
+        waitForAsync(
             inject([], () => {
                 router.stateService.go('sync', {param1: 1}).then(() => {
-                    let
+                    const
                         component = appComponent.query(By.directive(SyncTestComponent)).componentInstance;
 
                     expect(component.param1.pk).toBe(1);
@@ -280,10 +280,10 @@ describe('UrlTypeFactoryService', () => {
     );
 
     it('Does bind asynchronous url types',
-        async(
+        waitForAsync(
             inject([], () => {
                 router.stateService.go('async', {param1: 1}).then(() => {
-                    let
+                    const
                         component = appComponent.query(By.directive(AsyncTestComponent)).componentInstance;
 
                     expect(component.param1.pk).toBe(1);
@@ -295,10 +295,10 @@ describe('UrlTypeFactoryService', () => {
     );
 
     it('Does bind synchronous and asynchronous url types',
-        async(
+        waitForAsync(
             inject([], () => {
                 router.stateService.go('sync-async', {param1: 1, param2: 1}).then(() => {
-                    let
+                    const
                         component = appComponent.query(By.directive(SyncAsyncTestComponent)).componentInstance;
 
                     expect(component.param1.pk).toBe(1);
@@ -314,9 +314,9 @@ describe('UrlTypeFactoryService', () => {
     );
 
     it('Does represent primitive in url',
-        async(
+        waitForAsync(
             inject([], () => {
-                let
+                const
                     url = router.stateService.href('sync-async', {param1: 1, param2: 2});
 
                 expect(url).toBe('#/sync-async/1/2');
@@ -325,9 +325,9 @@ describe('UrlTypeFactoryService', () => {
     );
 
     it('Does represent objects in url',
-        async(
+        waitForAsync(
             inject([], () => {
-                let
+                const
                     url = router.stateService.href('sync-async', {
                         param1: {
                             pk: 1,
@@ -343,9 +343,9 @@ describe('UrlTypeFactoryService', () => {
     );
 
     it('Does get url if param matches the type pattern',
-        async(
+        waitForAsync(
             inject([], () => {
-                let
+                const
                     url = router.stateService.href('match', {param1: 'a-1'});
 
                 expect(url).toBe('#/match/a-1');
@@ -354,9 +354,9 @@ describe('UrlTypeFactoryService', () => {
     );
 
     it('Does not get url if param does not match the type pattern',
-        async(
+        waitForAsync(
             inject([], () => {
-                let
+                const
                     url = router.stateService.href('match', {param1: 'b-1'});
 
                 expect(url).toBe(null);
@@ -365,7 +365,7 @@ describe('UrlTypeFactoryService', () => {
     );
 
     it('Does not call resolve for creating the url from primitive',
-        async(
+        waitForAsync(
             inject([], () => {
                 ResolveTestType['resolved'] = false;
 
@@ -377,7 +377,7 @@ describe('UrlTypeFactoryService', () => {
     );
 
     it('Does not call resolve for creating the url from object',
-        async(
+        waitForAsync(
             inject([], () => {
                 ResolveTestType['resolved'] = false;
 
@@ -391,7 +391,7 @@ describe('UrlTypeFactoryService', () => {
     );
 
     it('Does call resolve for changing state from primitive',
-        async(
+        waitForAsync(
             inject([], () => {
                 ResolveTestType['resolved'] = false;
 
@@ -403,7 +403,7 @@ describe('UrlTypeFactoryService', () => {
     );
 
     it('Does not call resolve for changing state from object',
-        async(
+        waitForAsync(
             inject([], () => {
                 ResolveTestType['resolved'] = false;
 
